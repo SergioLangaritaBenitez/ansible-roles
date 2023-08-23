@@ -1,0 +1,6 @@
+- import_tasks: docker.yaml
+  when: install_docker == True
+
+
+- import_tasks: normal.yaml
+  when: install_docker == False

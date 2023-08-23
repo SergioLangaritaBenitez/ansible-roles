@@ -1,0 +1,25 @@
+- name: Install openjdk-8-jdk
+  apt:
+    name: openjdk-8-jdk
+    state: latest
+    update_cache: true
+
+- shell: echo JAVA_HOME is $JAVA_HOME
+  environment:
+    JAVA_HOME: "{{JAVA_HOME}}"
+  register: shellout
+
+- debug: var=shellout
+
+- name: Add cassandra to the repository
+  shell: echo "deb https://debian.cassandra.apache.org 41x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+
+- name: Download cassandra keys
+  shell: curl https://downloads.apache.org/cassandra/KEYS | sudo apt-key add -
+
+- name: Install cassandra 
+  apt:
+    name: cassandra
+    state: latest
+    update_cache: true
+

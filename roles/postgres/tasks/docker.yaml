@@ -1,0 +1,18 @@
+- name: Pull default Docker image
+  community.docker.docker_image:
+    name: "{{ default_container_image }}"
+    source: pull
+
+- name: Create default containers
+  community.docker.docker_container:
+    name: "{{ default_container_name }}"
+    image: "{{ default_container_image }}"
+
+    ports:
+   
+      - "{{postgres_port}}:{{postgres_port}}"
+    env:
+      POSTGRES_USER: "{{postgres_user}}"
+      POSTGRES_PASSWORD: "{{postgres_password}}"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      POSTGRES_DB: "{{postgres_database}}"

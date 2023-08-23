@@ -1,0 +1,6 @@
+- name: Update the machine
+  ansible.builtin.apt:
+    update_cache: yes     
+
+- name: Install Nagios
+  shell: curl https://assets.nagios.com/downloads/nagiosxi/install.sh | sh

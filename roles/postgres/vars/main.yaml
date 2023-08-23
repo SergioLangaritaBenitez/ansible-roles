@@ -1,0 +1,9 @@
+install_docker: False
+
+container_count: 1
+default_container_name: postgres
+default_container_image: postgres:15
+postgres_port: 5432
+postgres_user: admin
+postgres_password: root
+postgres_database: testdb

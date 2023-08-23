@@ -1,0 +1,13 @@
+- name: trying roles
+  hosts: master
+  #remote_user: root
+  roles:
+  #-  role: "./roles/postgres"
+  #-  role: "./roles/docker"
+  #-  role: "./roles/mariadb"
+  #-  role: "./roles/mongodb"
+  #-  role: "./roles/jupyter"
+  #-  role: "./roles/cassandra"
+  -  role: "./roles/nagios"
+  #-  role: "./roles/k8"
+

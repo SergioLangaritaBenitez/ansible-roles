@@ -1,0 +1,5 @@
+default_container_name: jupyter-notebook
+alias_container: jupyter-notebook-docker
+default_container_image: jupyter/base-notebook
+jupyter_port: 8888
+jupyter_token: root
