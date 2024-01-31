@@ -22,21 +22,31 @@ ansible-playbook -i inventory ansible-roles.yaml
 
 # Roles creados
 
-- [ ]  María db
-  - [x]  Normal                                 #mysql -u realuser -h 192.168.56.2  -p
-  - [ ]  Docker                                 #El docker no se mantiene
+- [x]  Docker 
+- [x]  Jupyter                                   #http://192.168.56.2
+- [x]  María db
+  - [x]  Normal                                 #mysql -u user -h 192.168.56.2  -p
+  - [x]  Docker                                 #mysql -u user -h 192.168.56.2  -p
 - [x]  Posgres
-  - [x]  Normal                                  #psql  -h localhost -U admin testdb (falta psql en remoto) 
+  - [x]  Normal                                  #psql  -h 192.168.56.2 -U admin testdb
   - [x]  Docker                                  #psql  -h 192.168.56.2 -U admin testdb
 - [ ]  Mongo 
   - [x]  1 Nodo                                  #mongo (no tiene contraseña, no se ha comprobado si se accede desde remoto)          
-  - [ ]  Mongo atlas
-- [x]  Docker 
-- [x]  Jupyter                                   #http://192.168.56.2
-
+  - [ ]  Replica & Sharding
 - [ ]  Cassandra
   - [x]  1 Nodo                                  cqlsh (no tiene contraseña,no se ha comprobado por cqlsh en remoto)
   - [ ]  Cassandra cluster
-
 - [x]  Nagios
-- [ ]  Kubernetes
+- [ ]  Kubernetes                                 #Fallo
+- [ ]  Spark                                      #https://data-flair.training/blogs/install-apache-spark-multi-node-cluster/
+- [ ]  Kafka
+  - [ ]  1 Nodo                                  
+  - [ ]  Varios Nodos
+
+
+
+
+ansible-galaxy collection install community.docker
+ansible-galaxy collection install community.postgresql
+ansible-galaxy collection install ansible.posix
+ansible-galaxy collection install community.general

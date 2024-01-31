@@ -1,7 +1,19 @@
+- name: Update the machine
+  ansible.builtin.apt:
+    update_cache: yes   
 
-- name: Install gnupg
+
+- name: Install software-properties-common gnupg apt-transport-https ca-certificates
   package:
-    name: gnupg
+    name:
+    - software-properties-common
+    - gnupg
+    - apt-transport-https
+    - ca-certificates  
+    - wget
+    - curl
+    - gnupg2
+    - lsb-release
     state: present
 
 - name: Import the public key used by the package management system

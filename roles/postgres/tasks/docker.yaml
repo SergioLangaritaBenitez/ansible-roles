@@ -7,9 +7,7 @@
   community.docker.docker_container:
     name: "{{ default_container_name }}"
     image: "{{ default_container_image }}"
-
     ports:
-   
       - "{{postgres_port}}:{{postgres_port}}"
     env:
       POSTGRES_USER: "{{postgres_user}}"

@@ -1,27 +1,28 @@
-    - name: Update the machine
-      ansible.builtin.apt:
-        update_cache: yes     
+- name: Update the machine
+  ansible.builtin.apt:
+    update_cache: yes     
 
-    - name: Install MariaDB Server version:{{mysql_version}}
-      apt: name=mariadb-server state={{mysql_version}}
-      
-    - name: Install MariaDB Client version:{{mysql_version}}
-      apt: name=mariadb-client state={{mysql_version}}
+- name: Install MariaDB Server version:{{mariadb_version}}
+  apt: name=mariadb-server state={{mariadb_version}}
+  
+- name: Install MariaDB Client version:{{mariadb_version}}
+  apt: name=mariadb-client state={{mariadb_version}}
 
-    - name: Add a password to root user
-      shell: mysql -u root -e "CREATE USER '{{mysql_user}}'@'%' IDENTIFIED BY '{{mysql_password}}';"
 
-    - name: Grant privileges 
-      shell: mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO '{{mysql_user}}'@'%' WITH GRANT OPTION;"
+- name: Add a password to the user:{{mariadb_user}}
+  shell: mysql -u root -e "CREATE USER '{{mariadb_user}}'@'%' IDENTIFIED BY '{{mariadb_password}}';"
 
-    - name: Flush privileges 
-      shell: mysql -u root -e "FLUSH PRIVILEGES";
-    
-    - name: Something with web
-      shell: sed -i 's/bind-address            = 127.0.0.1/bind-address            = 0.0.0.0/g' /etc/mysql/mariadb.conf.d/50-server.cnf
-    
-    - name: Restart mysql
-      ansible.builtin.service:
-        name: mysql
-        state: restarted
-        enabled: true
+- name: Grant privileges 
+  shell: mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO '{{mariadb_user}}'@'%' WITH GRANT OPTION;"
+
+- name: Flush privileges 
+  shell: mysql -u root -e "FLUSH PRIVILEGES";
+
+- name: Something with web
+  shell: sed -i 's/bind-address            = 127.0.0.1/bind-address            = 0.0.0.0/g' /etc/mysql/mariadb.conf.d/50-server.cnf
+
+- name: Restart mysql
+  ansible.builtin.service:
+    name: mysql
+    state: restarted
+    enabled: true

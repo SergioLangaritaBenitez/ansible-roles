@@ -4,10 +4,23 @@
   roles:
   #-  role: "./roles/postgres"
   #-  role: "./roles/docker"
-  #-  role: "./roles/mariadb"
+  #-  role: "./roles/postgres"
+     #when: False
   #-  role: "./roles/mongodb"
   #-  role: "./roles/jupyter"
-  #-  role: "./roles/cassandra"
-  -  role: "./roles/nagios"
+  -  role: "./roles/cassandra"
+  #-  role: "./roles/nagios"
   #-  role: "./roles/k8"
+
+- name: trying roles
+  hosts: wn
+  #remote_user: root
+  roles:
+#  - { role: "./roles/postgres", install_docker: True }
+  -  role: "./roles/mongodb"
+  #-  role: "./roles/docker"
+#- name: trying roles
+#  hosts: wn
+#  roles:
+#   -  role: "./roles/k8"
 

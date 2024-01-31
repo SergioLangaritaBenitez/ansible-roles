@@ -1,0 +1,139 @@
+- name: Remove swapfile from /etc/fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  with_items:
+    - swap
+    - none
+
+- name: Disable swap
+  retries: 10
+  delay: 20
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+
+
+- name: Add an apt signing key for Kubernetes
+  retries: 10
+  delay: 20
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Adding apt repository for Kubernetes
+  retries: 10
+  delay: 20
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
+
+- name: Install Kubernetes binaries
+  retries: 10
+  delay: 20
+  apt: 
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - kubelet 
+      - kubeadm 
+      - kubectl
+
+- name: Setup kubeconfig for vagrant user
+  command: "{{ item }}"
+  with_items:
+    - mkdir -p /etc/default
+    - touch /etc/default/kubelet
+
+
+- name: Configure node ip
+  lineinfile:
+    path: /etc/default/kubelet
+    line: KUBELET_EXTRA_ARGS=--node-ip="{{ ansible_eth1.ipv4.address }}"
+
+
+- name: Remove containerd config
+  when: inventory_hostname in groups["master"]
+  ignore_errors: yes
+  command: sed -i 's/disabled_plugins = ["cri"]*/# disabled_plugins = ["cri"]/' /etc/containerd/config.toml 
+#rm /etc/containerd/config.toml
+
+- name: Restart containerd
+  service:
+    name: containerd
+    state: restarted
+
+- name: Restart kubelet
+  service:
+    name: kubelet
+    state: restarted
+
+- name: Pause for 5 seconds to wait kubelet to restart
+  pause:
+    seconds: 5
+
+#- name: wait Kube to start on "{{ansible_eth1.ipv4.address }}"
+#  wait_for:
+#    port: 6443
+#    host: "{{ansible_eth1.ipv4.address }}"
+#    delay: 5
+#Intitialize Kubernetes cluster with kubeadm using  only master
+
+- name: Initialize the Kubernetes cluster using kubeadm
+  when: inventory_hostname in groups["master"]
+  command: kubeadm init 
+#--apiserver-advertise-address="{{ ansible_eth1.ipv4.address }}" --apiserver-cert-extra-sans="{{ ansible_eth1.ipv4.address }}"  --node-name k8s-master --pod-network-cidr=192.168.56.0/16
+
+
+#Kubeconfig
+
+- name: Setup kubeconfig for vagrant user
+  when: inventory_hostname in groups["master"]
+  command: "{{ item }}"
+  with_items:
+    - mkdir -p /root/.kube
+    - cp -i /etc/kubernetes/admin.conf /root/.kube/config
+    - chown root:root /root/.kube/config
+
+
+# install things
+- name: Pause for 5 seconds to wait kubelet to restart
+  pause:
+    seconds: 5
+    
+#- name: Install calico pod network
+#  when: inventory_hostname in groups["master"]
+#  command: kubectl create -f https://docs.projectcalico.org/v3.4/getting-started/kubernetes/installation/hosted/calico.yaml
+
+#dont ask
+
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- name: Copy join command to local file
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
+
+
+#handles:
+- name: docker status
+  service: name=docker state=started
+
+
+#  Normal   NodeHasSufficientMemory  20m (x8 over 20m)  kubelet          Node k8s-master status is now: NodeHasSufficientMemory
+#  Normal   NodeAllocatableEnforced  20m                kubelet          Updated Node Allocatable limit across pods
+#  Normal   Starting                 20m                kubelet          Starting kubelet.
+#  Warning  InvalidDiskCapacity      20m                kubelet          invalid capacity 0 on image filesystem
+#  Normal   NodeHasNoDiskPressure    20m (x7 over 20m)  kubelet          Node k8s-master status is now: NodeHasNoDiskPressure
+#  Normal   NodeHasSufficientPID     20m (x7 over 20m)  kubelet          Node k8s-master status is now: NodeHasSufficientPID
+#  Normal   NodeHasNoDiskPressure    19m                kubelet          Node k8s-master status is now: NodeHasNoDiskPressure
+#  Normal   NodeAllocatableEnforced  19m                kubelet          Updated Node Allocatable limit across pods
+#  Normal   NodeHasSufficientPID     19m                kubelet          Node k8s-master status is now: NodeHasSufficientPID
+#  Normal   Starting                 19m                kubelet          Starting kubelet.
+#  Normal   NodeHasSufficientMemory  19m                kubelet          Node k8s-master status is now: NodeHasSufficientMemory
+#  Warning  InvalidDiskCapacity      19m                kubelet          invalid capacity 0 on image filesystem
+

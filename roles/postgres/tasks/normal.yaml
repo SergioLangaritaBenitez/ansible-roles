@@ -46,10 +46,15 @@
     privs: all
   become: yes
   become_user: postgres
-  
-- name: ok
-  shell: echo "host    all             all             0.0.0.0/0            md5" >> /etc/postgresql/14/main/pg_hba.conf
 
 
+- name: listenaddress to everyone
+  shell: echo "listen_addresses = '*'" >> /etc/postgresql/14/main/postgresql.conf
 
-#echo "host all all all $POSTGRES_HOST_AUTH_METHOD" >> pg_hba.conf
+- name: Add permissions pg_hba.conf
+  shell: echo "host    all             all             0.0.0.0/0               scram-sha-256" >> /etc/postgresql/14/main/pg_hba.conf
+
+- name: "Restart services"
+  service: "name={{ item }} state=restarted enabled=yes"
+  with_items:
+    - postgresql

@@ -1,38 +1,45 @@
-      - name: Install aptitude
-        apt:
-          name: aptitude
-          state: latest
-          update_cache: true
+- name: Update the machine
+  retries: 10
+  delay: 20
+  ansible.builtin.apt:
+    update_cache: yes   
 
-      - name: Install required system packages
-        apt:
-          pkg:
-            - apt-transport-https
-            - ca-certificates
-            - curl
-            - software-properties-common
-            - python3-pip
-            - virtualenv
-            - python3-setuptools
-          state: latest
-          update_cache: true
+- name:  Install required system packages
+  retries: 10
+  delay: 20
+  package:
+    name:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+    - python3-pip
+    state: present
 
-      - name: Add Docker GPG apt Key
-        apt_key:
-          url: https://download.docker.com/linux/ubuntu/gpg
-          state: present
+- name: Add Docker GPG apt Key
+  retries: 10
+  delay: 20
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
 
-      - name: Add Docker Repository
-        apt_repository:
-          repo: deb https://download.docker.com/linux/ubuntu focal stable
-          state: present
+- name: Add Docker Repository
+  retries: 10
+  delay: 20
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu focal stable
+    state: present
 
-      - name: Update apt and install docker-ce
-        apt:
-          name: docker-ce
-          state: latest
-          update_cache: true
+- name: Update apt and install docker-ce
+  retries: 10
+  delay: 20
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: true
 
-      - name: Install Docker Module for Python
-        pip:
-          name: docker
+- name: Install Docker Module for Python
+  retries: 10
+  delay: 20
+  pip:
+    name: docker
